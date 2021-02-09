@@ -11,7 +11,8 @@ function decode(val) {
 }
 
 class User {
-  constructor(nick, color, style, home) {
+  constructor(nick, color, style, home, room) {
+this.room = room?? "";
     this.nick = typeof nick === "string" ? nick : "anonymous";
     this.color = typeof color === "string" ? color : "";
     this.style = typeof style === "string" ? style : "";
@@ -43,7 +44,8 @@ class Message {
   }
 }
 class MessageReceived {
-  constructor(content, date, nick, color, style, home) {
+  constructor(content, date, nick, color, style, home, room) {
+	this.room = room;
     this.content = typeof content === "string" ? content : "";
 	this.nick = typeof nick === "string" ? nick : "";
 	this.color = typeof color === "string" ? color : "";
@@ -67,6 +69,7 @@ class Trollbox {
     this.server = typeof server === "string" ? server : "http://www.windows93.net:8081";
     this.user = user instanceof User ? user : (typeof user === "string" ? new User(user) : new User());
     let url = new URL(this.server);
+this.usercache = {}
 
     if (emulateBrowser == true) {
       this.socket = io(this.server, {
@@ -97,10 +100,21 @@ class Trollbox {
     this.on_user_left = function(user) {};
     this.on_user_change_nick = function(previous, current) {};
     this.on_update_users = function(users) {};
+    this.on_update_users_raw = function(users) {};
     this.on_error = function(err) { console.error(err); };
 
     this.socket.on("message", data => {
       if (!data || typeof data.msg !== "string" || typeof data.nick !== "string") return;
+      var id_
+      
+      for (var i = 0; i < this.usercache.length; i++) {
+	if (this.usercache[i].nick == data.nick && this.usercache[i].home == data.home) {
+		id_ = i
+		//console.log('correct')
+	}
+      }
+      var room = (this.usercache[id_]?? {room: "failed-to-fetch-room"}).room
+      
       try {
         this.on_message(
           new MessageReceived(
@@ -109,7 +123,8 @@ class Trollbox {
             decode(data.nick),
             decode(data.color),
             decode(data.style),
-            data.home
+            data.home,
+	    room
         ));
       } catch (err) {
         this.on_error(err);
@@ -155,6 +170,9 @@ class Trollbox {
       } catch (err) {
         this.on_error(err);
       }
+      this.on_update_users_raw(Object.values(data))
+      // mod
+      this.usercache = Object.values(data);
     });
   }
 
