@@ -163,13 +163,6 @@ bot.send("you arnt very amdin")}
   if (msg.content.toLowerCase() === pref+"othername") {
     bot.socket.emit('user joined','Leavanny ['+pref+'h]','#3DC12F;bot','','','')
   }
-
-  if (msg.content.startsWith('^users ')) {
-    var name = msg.content.replace('^users ','')
-    var getRoomUsers = ((name) => {var tmp = []; for (i = 0; i < bot.usercache.length; i++) {if (bot.usercache[i].room == name) {tmp.push(bot.usercache[i])}} return tmp ? tmp : false;})
-    if (getRoomUsers(name).length < 1) {return bot.send('This room does not exist.')}
-    bot.send(`Users in ${name}:\n${getRoomUsers(name).map((x,y) => {return require('he').decode(x.nick)}).join('\n')}`)
-    }
     
   if (msg.content.toLowerCase() === pref+"myspace") {
     txt = "MySpace Links\nMine: https://myspace.windows93.net/index.php?id=13516 \nMagestick's MySpace: https://myspace.windows93.net/index.php?id=4646"
@@ -769,23 +762,6 @@ if (msg.content.startsWith(pref+"fb64 ")) {
 }catch(err){
   bot.send("An error has occurred!\n"+err.toString())
 }
-
-var dmessagea = msg.content;
-var args = dmessagea.split(' ').slice(1);
-if (msg.content.toLowerCase().startsWith(pref+"urban")){
-  if (!args.length) {
-    return bot.send('You need to supply a search term!');
-  }try{
-query = querystring.stringify({ term: args.join(' ') });
-
-  var { list } = await fetch(`https://api.urbandictionary.com/v0/define?${query}`).then(response => response.json());
-  if (!list.length) {
-  return bot.send(`An unknown error has occurred\nWe cant found definition: "${args.join(' ')}"\nError Code: DEFINITION_NOT_FOUND`);
-}
-bot.send(list[0].definition);
-}catch (err){
-  bot.send("An unknown error has occurred!\nError Code: UNKNOWN_DEFINITION")
-  }
 }
 };
 bot.connect();
