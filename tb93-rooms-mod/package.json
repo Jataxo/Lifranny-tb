@@ -1,0 +1,16 @@
+{
+  "name": "tb93-rooms-mod",
+  "version": "1.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "he": "^1.2.0",
+    "socket.io-client": "^2.2.0"
+  }
+}
